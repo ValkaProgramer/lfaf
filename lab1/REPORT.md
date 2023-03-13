@@ -1,4 +1,4 @@
-##Vladimir Luchianov FAF-212 Lab 1
+## Vladimir Luchianov FAF-212 Lab 1
 
 Variant 14:  
 VN={S, B, D},  
