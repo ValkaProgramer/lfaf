@@ -1,27 +1,16 @@
 ##Vladimir Luchianov FAF-212 Lab 1
 
-Variant 14:
-
-VN={S, B, D},
-
-VT={a, b, c, d},
-
-P={
-
-S → aS
-
-S → bB
-
-B → cB
-
-B → d
-
-B → aD
-
-D → aB
-
-D → b
-
+Variant 14:  
+VN={S, B, D},  
+VT={a, b, c, d},  
+P={  
+S → aS  
+S → bB  
+B → cB  
+B → d  
+B → aD  
+D → aB  
+D → b  
 }
 
 I created two classes named **Grammar** and **FiniteAutomaton**.
