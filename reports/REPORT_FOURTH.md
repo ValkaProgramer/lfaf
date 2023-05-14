@@ -40,12 +40,20 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
 ```
     def toCNF(self):
 
+```
+
+I created variables to store new production dictionary, sets of new terminal and terminal symbols. Also I declared a list and a dictionary in order to compute these assets.
+
+```
+
         epsilon = []
         newP = {}
         newVT = set()
         newVN = set()
         temp = {}
-
+```
+In this piece of code the method determines if new state should take place.
+```
         new_state = False
 
         for N, productions in self.P.items():
@@ -53,18 +61,27 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                 if 'S' in production:
                     new_state = True
 
+```
+Here the new start state is created if there is a need
+```
         if new_state:
             new_start = 'Z'
             temp['Z'] = ['S']
-
+```
+In this piece of code a set of non-terminal symbols with e-productions is computed 
+```
         for N, productions in self.P.items():
             for production in productions:
                 if not production:
                     epsilon.append(N)
-
+```
+In this piece of code a copy of the initial production is created
+```
         for key in self.P.keys():
             temp[key] = self.P[key].copy()
-
+```
+Furthermore, in a while loop for every stored nt symbol the procedure of eliminating epsilon-production initiates.
+```
         while(epsilon):
             for state in epsilon:
                 for NT in self.P.keys():
@@ -88,27 +105,33 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                     for item in additional:
                         if item not in temp[NT]:
                             temp[NT].append(item)
-
+```
+Current nt symbol's with epsilon-production removal from the queue comes next
+```
                 for N, productions in temp.items():
                     for index in range(len(productions)):
                         if not productions[index] and N == state:
                             productions.pop(index)
                             epsilon.remove(state)
                             break
-
+```
+Checking for new such symbols comes right after
+```
             for N, productions in temp.items():
                 for production in productions:
                     if not production and N not in epsilon:
                         epsilon.append(N)
-
+```
+Unit productions removal comes next. While loop continues until no unit productions are found in the temporary storage of the new production. It also contains a loop inside which deletes unit production and adds each deleted right side non-terminal symbol productions to the productions of the left side non-terminal symbol
+```
         some_bool = False
 
         for N in temp.keys():
-                additional = []
-                for production in temp[N]:
-                    for state in temp.keys():
-                        if production == state:
-                            some_bool = True
+            additional = []
+            for production in temp[N]:
+                for state in temp.keys():
+                    if production == state:
+                        some_bool = True
 
         while(some_bool):
             for N in temp.keys():
@@ -130,8 +153,9 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                         for state in temp.keys():
                             if production == state:
                                 some_bool = True
-
-
+```
+Next piece of code performs a search of productions containing both non-terminal and terminal symbols on the right side.
+```
         additional_VT = {}
         for N, productions in temp.items():
             for production in productions:
@@ -143,7 +167,9 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
             for N in temp.keys():
                 if len(temp[N]) == 1 and temp[N][0] == symbol and N not in additional_VT[symbol]:
                     additional_VT[symbol].append(N)
-
+```
+Making a different A -> a type production for each terminal symbol found and adding these productions to the temporal storage of the new production.
+```
         for key in additional_VT.keys():
             if not additional_VT[key]:
                 for index in range(len(string.ascii_uppercase)):
@@ -151,12 +177,12 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                         additional_VT[key] = [string.ascii_uppercase[index]]
                         break
 
-
         for key in additional_VT.keys():
             if additional_VT[key][0] not in temp.keys():
                 temp[additional_VT[key][0]] = [key]
-
-
+```
+Replacing every terminal symbol in productions found previously with new non-terminal symbols
+```
         for symbol in additional_VT.keys():
             for N in temp.keys():
                 for number in range(len(temp[N])):
@@ -168,10 +194,14 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                             else:
                                 result += temp[N][number][index]
                         temp[N][number] = result
-
+```
+Next comes the process of eliminating A -> A1..An productions. Initially creates an empty tuple for storing productions to be changed and a while loop helper variable assigned to True.
+```
         binFound = True
         toReplace = ()
-
+```
+Right after a while loop is perfomed, which runs until no such productions are found. This loop contains another loop which runs through every production and creates new production Xi -> Ai-1Ai
+```
         while binFound:
             binFound = False
             for N in temp.keys():
@@ -192,7 +222,9 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                     for index in range(len(temp[N])):
                         if toReplace[1] in temp[N][index] and len(temp[N][index]) > 2:
                             temp[N][index] = temp[N][index].replace(toReplace[1], toReplace[0])
-
+```
+Next step the method perfoms is deleting unaccesable symbols. Firstly it detects non-terminal symbols to be deleted.
+```
         toDelete = []
 
         for state in temp.keys():
@@ -209,10 +241,14 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                     break
             if notUsed:
                 toDelete.append(state)
-
+```
+Then the method deletes them in a single for loop
+```
         for item in toDelete:
             temp.pop(item)
-
+```
+Assigning values of temporal variables to the final ones
+```
         for key in temp.keys():
             newVN.add(key)
             for production in temp[key]:
@@ -221,7 +257,9 @@ In this lab I added a method called _toCNF_ to **Grammar** which converts an obj
                         newVT.add(symbol)
 
         newP = temp.copy()
-
+```
+Returning a tuple of arguments convenient for making a CNF **Grammar** object, equivalent to the initial by grammar rules
+```
         return (newVN, newVT, newP, new_start)
 ```
 
